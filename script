@@ -1,0 +1,48 @@
+# Esse script le uma planilha que tenha as colunas "Nome Empresarial","Logradouro","numero","municipio" e "Estado"
+# o objetivo é obter as coordenadas de empresas e seus respectivos endereços
+# contudo, é possível obter coordenadas inserindo somente o CEP
+
+import pandas
+from geopy.geocoders import ArcGIS
+import time
+import random
+
+nom = ArcGIS()
+
+
+
+
+df = pandas.read_excel('enderecos-01.xlsx',sheet_name='Planilha1')
+#print(df)
+
+#alterou a coluna de endereços para juntar todos eles
+df['Endereco']=str(df['logradouro'])+str(df['numero'])+','+str(df['municipio'])+','+str(df['Estado'])
+#print(df)
+
+tamanho = len(df.index)
+
+
+for linha in range(tamanho):
+    df.loc[linha,'Endereco']=str(df.loc[linha,'logradouro'])+' '+str(df.loc[linha,'numero'])+','+str(df.loc[linha,'municipio'])+','+str(df.loc[linha,'Estado'])
+        
+    coordenada = nom.geocode(df.loc[linha,'Endereco'])
+    
+    df.loc[linha,'Latitude']=coordenada.latitude
+    df.loc[linha,'Longitude'] = coordenada.longitude
+    
+    tempo_aleatorio = random.randint(1,5)
+    time.sleep(tempo_aleatorio)
+    
+    
+    #print(df.loc[linha,'Coordinates'])
+    
+    #df.loc[linha,'Latitude']=df.loc[linha,'Coordinates'].apply(lambda x: x.latitude if x != None else None)
+    
+    #df.loc[linha,'Longitude']=df.loc[linha,'Coordinates'].apply(lambda x: x.longitude if x != None else None)
+    
+    print(df.loc[linha,'Nome Empresarial'])
+    
+
+df.to_excel('coordenadas-enderecos01.xlsx',sheet_name = 'Planilha1', index=False, ) 
+    
+print('Terminou!')
